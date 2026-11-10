@@ -10,16 +10,16 @@ import { CategoriaService } from '../../../core/services/categoria.service';
   templateUrl: './categoria-lista.html',
 })
 export class CategoriaLista implements OnInit {
-  categorias!:Categoria[];
+  categorias: Categoria[] = [];
   categoriaSelecionada: Categoria | null = null;
-  constructor(private categoriaService: CategoriaService) {
-    
-  }
+
+  constructor(private categoriaService: CategoriaService) {}
+
   ngOnInit(): void {
     this.carregarCategorias();
   }
 
-  carregarCategorias() {
+  carregarCategorias(): void {
     this.categorias = this.categoriaService.listar();
   }
 
@@ -27,7 +27,7 @@ export class CategoriaLista implements OnInit {
     this.categoriaSelecionada = { ...categoria };
   }
 
-  aoSalvar():void {
+  aoSalvar(): void {
     this.categoriaSelecionada = null;
     this.carregarCategorias();
   }
