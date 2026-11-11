@@ -29,13 +29,13 @@
                 <tr>
                   <td>{{ categoria.descricao }}</td>
                   <td>{{ categoria.tipo === 'RECEITA' ? 'Receita' : 'Despesa' }}</td>
-                  <td>{{ categoria.ativo ? 'Ativa' : 'Inativa' }}</td>
+                  <td>{{ categoria.ativa ? 'Ativa' : 'Inativa' }}</td>
                   <td>
                     <button type="button" class="btn btn-sm btn-outline-primary me-2"
                       (click)="editar(categoria)">Editar</button>
                     <button type="button" class="btn btn-sm btn-outline-secondary"
-                      (click)="alterarSituacao(categoria.id)">
-                      {{ categoria.ativo ? 'Inativar' : 'Ativar' }}
+                      (click)="alterarSituacao(categoria)">
+                      {{ categoria.ativa ? 'Inativar' : 'Ativar' }}
                     </button>
                   </td>
                 </tr>
@@ -49,4 +49,3 @@
     </div>
   </section>
 </div>
-

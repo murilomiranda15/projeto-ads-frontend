@@ -1,6 +1,6 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Categoria, CategoriaInput, TipoCategoria } from '../../../models/categoria.model';
+import { Categoria, CategoriaInput } from '../../../models/categoria.model';
 import { CategoriaService } from '../../../core/services/categoria.service';
 
 @Component({
@@ -10,60 +10,74 @@ import { CategoriaService } from '../../../core/services/categoria.service';
   templateUrl: './categoria-form.html',
 })
 export class CategoriaForm {
-
-  categoria = input<Categoria | null>(null);
+  categoria = input<Categoria|null>(null);
   salvou = output<void>();
   cancelou = output<void>();
   erro = '';
 
   formulario = new FormGroup({
-    descricao: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(3), Validators.maxLength(60)]
-    }),
-    tipo: new FormControl<TipoCategoria>('DESPESA', { nonNullable: true }),
-    ativo: new FormControl(true, { nonNullable: true })
+    descricao: new FormControl('',{
+      nonNullable:true,
+      validators:[
+      Validators.required,
+      Validators.minLength(3)
+    ]}),  
+    tipo: new FormControl<'RECEITA' | 'DESPESA'>(
+        'DESPESA',
+      { nonNullable: true }
+      ),
+    ativa: new FormControl(true, {
+      nonNullable: true
+    })
   });
 
-  constructor( private categoriaService:CategoriaService ) {
-    effect(() => {
+  constructor(private categoriaService:CategoriaService){
+    effect(()=>{
       const categoria = this.categoria();
       this.erro = '';
       this.formulario.reset(categoria ? {
         descricao: categoria.descricao,
-        tipo: categoria.tipo,
-        ativo: categoria.ativo
-      } : {
-        descricao: '', tipo: 'DESPESA', ativo: true
-      });
-    });
+        tipo:categoria.tipo,
+        ativa: categoria.ativa
+      }:{
+        descricao: '',
+        tipo:'DESPESA',
+        ativa: true
+      })
+    })
   }
-
-  salvar(): void {
-    if (this.formulario.invalid) {
+  salvar():void {
+    if (this.formulario.invalid){
       this.formulario.markAllAsTouched();
       return;
     }
-
     const dados: CategoriaInput = this.formulario.getRawValue();
     const categoria = this.categoria();
-    if (categoria === null) {
-      this.categoriaService.cadastrar(dados);
+    if (categoria === null){
+      console.log("Cadastrar!!")
+      this.categoriaService.cadastrar(dados).subscribe({
+        next: ()=>{
+              this.formulario.reset({descricao:'',tipo:'DESPESA',ativa:true});
+              this.salvou.emit();
+        },
+        error: erro => {
+          this.erro = "Ocorreu um erro ao gravar";
+          console.log(erro);
+        }
+      });
     } else {
-      const atualizada = this.categoriaService.atualizar(categoria.id, dados);
-      if (!atualizada) {
+      console.log("Atualizar!!")
+      const atualizada = this.categoriaService
+        .atualizar(categoria.id,dados);
+      if (!atualizada){
         this.erro = 'Categoria não encontrada para atualização.';
         return;
       }
     }
-
-    this.formulario.reset({ descricao: '', tipo: 'DESPESA', ativo: true });
-    this.salvou.emit();
   }
-
-  cancelar(): void {
+  cancelar():void {
     this.erro = '';
-    this.formulario.reset({ descricao: '', tipo: 'DESPESA', ativo: true });
+    this.formulario.reset({descricao:'',tipo:'DESPESA',ativa:true});
     this.cancelou.emit();
   }
 }
