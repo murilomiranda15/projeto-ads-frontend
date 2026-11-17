@@ -31,7 +31,4 @@ export class CategoriaService {
     return this.http.put<Categoria>(`${this.API}/${id}`,dados);
   }
 
-  apagar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.API}/${id}`);
-  }
 }
